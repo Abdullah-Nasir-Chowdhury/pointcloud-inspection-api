@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pcinspect"
+version = "0.1.0"
+description = "3D point cloud defect inspection API: upload a scan, get an anomaly heatmap and a pass/fail score"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "open3d>=0.19",
+  "numpy",
+  "scipy",
+  "scikit-learn",
+  "fastapi",
+  "uvicorn[standard]",
+  "python-multipart",
+  "pillow",
+  "tifffile",
+  "pyyaml",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "httpx", "matplotlib"]
+
+[tool.setuptools.packages.find]
+include = ["pcinspect*"]
