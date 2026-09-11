@@ -14,18 +14,28 @@ except ImportError:  # pragma: no cover
 
 
 def greedy_coreset(x: np.ndarray, n_keep: int, proj_dim: int = 16, seed: int = 0) -> np.ndarray:
-    """Greedy k-center coreset on a random projection (Sinha et al. 2020). Returns indices."""
+    """Greedy k-center coreset on a random projection (PatchCore, Roth et al. 2022).
+
+    Picks points one at a time, always the one farthest from everything already picked,
+    so the subset covers the feature space evenly. Distances are computed in a `proj_dim`
+    random projection (Johnson-Lindenstrauss) to make each step cheap. Returns indices.
+    """
     rng = np.random.default_rng(seed)
-    if n_keep >= len(x):
-        return np.arange(len(x))
-    proj = x @ rng.standard_normal((x.shape[1], proj_dim)).astype(x.dtype)
-    chosen = [int(rng.integers(len(x)))]
-    min_d = np.linalg.norm(proj - proj[chosen[0]], axis=1)
-    for _ in range(n_keep - 1):
+    n = len(x)
+    if n_keep >= n:
+        return np.arange(n)
+    proj = np.ascontiguousarray(x @ rng.standard_normal((x.shape[1], proj_dim)).astype(np.float32))
+    sq = np.einsum("ij,ij->i", proj, proj)
+    chosen = np.empty(n_keep, dtype=np.int64)
+    chosen[0] = rng.integers(n)
+    # squared distance to the nearest chosen point so far
+    min_d = sq - 2 * (proj @ proj[chosen[0]]) + sq[chosen[0]]
+    for k in range(1, n_keep):
         i = int(np.argmax(min_d))
-        chosen.append(i)
-        min_d = np.minimum(min_d, np.linalg.norm(proj - proj[i], axis=1))
-    return np.asarray(chosen)
+        chosen[k] = i
+        d = sq - 2 * (proj @ proj[i]) + sq[i]
+        np.minimum(min_d, d, out=min_d)
+    return chosen
 
 
 class MemoryBank:
@@ -38,12 +48,14 @@ class MemoryBank:
             self._index = NearestNeighbors(n_neighbors=1).fit(self.features)
 
     @classmethod
-    def fit(cls, feature_sets: list[np.ndarray], max_per_sample: int | None = 4000,
-            coreset_fraction: float | None = None, seed: int = 0) -> "MemoryBank":
+    def fit(cls, feature_sets: list[np.ndarray], max_per_sample: int | None = 1000,
+            coreset_size: int | None = 40000, seed: int = 0) -> "MemoryBank":
         """Build a bank from per-scan feature arrays.
 
         max_per_sample: random cap per scan (cheap, keeps every scan represented).
-        coreset_fraction: if set, additionally reduce the pooled bank by greedy coreset.
+        coreset_size: if set, reduce the pooled bank to this many entries by greedy coreset.
+            Search time and model size scale linearly with bank size; 40k keeps a scan
+            under ~1 s on CPU.
         """
         rng = np.random.default_rng(seed)
         pooled = []
@@ -52,8 +64,8 @@ class MemoryBank:
                 f = f[rng.choice(len(f), max_per_sample, replace=False)]
             pooled.append(f)
         bank = np.concatenate(pooled).astype(np.float32)
-        if coreset_fraction is not None and 0 < coreset_fraction < 1:
-            bank = bank[greedy_coreset(bank, int(len(bank) * coreset_fraction), seed=seed)]
+        if coreset_size is not None and coreset_size < len(bank):
+            bank = bank[greedy_coreset(bank, coreset_size, seed=seed)]
         return cls(bank)
 
     def score(self, features: np.ndarray) -> np.ndarray:

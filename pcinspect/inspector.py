@@ -19,8 +19,8 @@ class InspectorConfig:
     fpfh: FPFHConfig = FPFHConfig()
     heatmap_sigma: float = 4.0     # px, Gaussian smoothing of the reprojected map
     topk_fraction: float = 0.01    # image score = mean of the top 1% point scores
-    max_per_sample: int | None = 4000
-    coreset_fraction: float | None = None
+    max_per_sample: int | None = 1000
+    coreset_size: int | None = 40000
 
 
 @dataclass
@@ -59,7 +59,7 @@ class Inspector:
     def fit(cls, train_scans: list[np.ndarray], cfg: InspectorConfig = InspectorConfig()) -> "Inspector":
         feats = [extract_features(x, cfg)[1] for x in train_scans]
         bank = MemoryBank.fit(feats, max_per_sample=cfg.max_per_sample,
-                              coreset_fraction=cfg.coreset_fraction)
+                              coreset_size=cfg.coreset_size)
         return cls(bank, cfg)
 
     def calibrate(self, val_scans: list[np.ndarray], percentile: float = 99.0, margin: float = 1.0) -> float:

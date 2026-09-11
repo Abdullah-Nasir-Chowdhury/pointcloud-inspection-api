@@ -1,0 +1,13 @@
+{
+  "bagel": {
+    "n_test": 110,
+    "image_auroc": 0.9901859504132231,
+    "pixel_auroc": 0.8941535371730194,
+    "aupro_30": 0.8673094066646799,
+    "accuracy_at_threshold": 0.9272727272727272,
+    "recall_at_threshold": 0.9204545454545454,
+    "false_alarm_rate": 0.045454545454545456,
+    "latency_ms_median": 1026.012250018539,
+    "bank_size": 40000
+  }
+}
