@@ -40,10 +40,10 @@ Reference numbers to beat or match (BTF, FPFH only): I-AUROC 0.865, AUPRO 0.924.
 - [x] `scripts/build_bank.py`, `scripts/evaluate.py`, `scripts/benchmark.py`
 - [x] FastAPI service: `POST /inspect` (tiff/ply upload -> JSON score + heatmap PNG),
       `GET /health`, `GET /categories`
-- [ ] Dockerfile (python:3.11-slim, CPU only) and `docker compose up`
-- [ ] Hugging Face Space (Gradio front end over the same scorer) as the live demo
+- [x] Dockerfile (python:3.11-slim, CPU only); build blocked until Docker Desktop is installed
+- [~] Hugging Face Space: assembled and tested locally (`scripts/build_space.py`); upload blocked, HF requires PRO for Gradio Spaces (402 on 2026-09-11)
 - [ ] README: client problem, results table, run steps, 60-90 s GIF
-- [ ] Benchmark table and one client-facing paragraph for proposals
+- [x] Benchmark table and one client-facing paragraph for proposals (`docs/CLIENT_PARAGRAPH.md`)
 - [x] Tests: loader, preprocessing invariants, API round trip on a synthetic sample
 
 ## Milestones

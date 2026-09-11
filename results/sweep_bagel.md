@@ -1,5 +1,5 @@
-# Sweep: tire
+# Sweep: bagel
 
 | Setting | Voxel (mm) | I-AUROC | P-AUROC | AUPRO@30% | Acc@thr | Latency (ms) | Time (s) |
 |---|---|---|---|---|---|---|---|
-| tp3000_topk0.01 | 1.85 | 0.396 | 0.942 | 0.833 | 0.223 | 652 | 279 |
+| tp3000_topk0.01 | 2.24 | 0.974 | 0.893 | 0.861 | 0.918 | 661 | 284 |
