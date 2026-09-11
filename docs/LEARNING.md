@@ -132,6 +132,7 @@ a tiny synthetic fixture so tests run in CI in seconds.
 ## Your tasks (do these yourself, then we review)
 
 - [ ] Reproduce the synthetic test by hand in a notebook and plot the heatmap
-- [ ] Sweep `voxel_size` in {1, 2, 4} mm on the bagel category and record I-AUROC and latency
-- [ ] Write `scripts/visualize.py`: RGB | depth | heatmap | ground truth side by side for one scan
+- [ ] Run `scripts/sweep.py --category dowel --target-points 0 1500 3000 6000` and explain the trade-off you see
+- [ ] Record the 60-90 s demo video: run `python demo/app.py`, click three examples, narrate what the heatmap shows (`scripts/make_figure.py` already renders the static figures; read it and explain the crop and overlay logic)
 - [ ] Explain in one paragraph (README) why nearest-neighbour distance is an anomaly score
+- [ ] Try to beat tire: add RGB features (frozen ResNet on the colour image, concatenated per point) and report the number, good or bad
