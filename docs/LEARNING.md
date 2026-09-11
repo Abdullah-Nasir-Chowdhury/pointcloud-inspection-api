@@ -41,6 +41,29 @@ Fix: choose the voxel size per category so every part gets ~6,000 points
 Lesson: when one category fails, measure before tuning. The first three checks ruled out the
 obvious suspects in ten minutes and pointed at the real one.
 
+### 2c. Second debugging story: stray points and the image score
+
+Full run v1: tire I-AUROC 0.405, below chance, while its pixel AUROC was 0.94 and AUPRO 0.82.
+Localisation fine, detection inverted. Sweeping voxel size and top-k did nothing (0.42-0.44).
+Reasoning: if defects rank high *within* each scan but good scans still get higher image
+scores, the image score is being set by something good scans have more of. Measured the
+neighbour count (points inside the FPFH radius) of the top-1% scored points on good tire scans:
+97-100% had under 30 neighbours against a median of 122. Those are stray points floating at the
+edges of no-return holes in the black rubber. Restricting to dense points, good scans dropped
+from 82 to the 30s. Fix: radius outlier removal on the downsampled cloud, with the threshold
+at 25% of the median neighbour count so it adapts to every category (`remove_sparse_points`).
+Lesson: localisation and detection metrics disagreeing is itself a clue. Ask what differs
+between images, not within them.
+
+### 2d. The pass/fail threshold is a business decision
+
+The threshold is a percentile of image scores on defect-free validation scans. With 20-40
+validation scans, the 99th percentile is just the maximum, and in v1 that starved recall
+(peach: I-AUROC 0.973 but accuracy at threshold 0.36). The default is now the 95th percentile,
+meaning "accept about 5% false alarms". A real client chooses this from the cost of a missed
+defect versus the cost of a manual re-check; the API exposes the raw score and the threshold
+so they can move it without retraining.
+
 ## 3. FPFH descriptors (`pcinspect/features/fpfh.py`)
 
 Fast Point Feature Histograms (Rusu 2009) describe local surface shape around a point as a

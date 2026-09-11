@@ -1,0 +1,112 @@
+{
+  "foam": {
+    "n_test": 100,
+    "image_auroc": 0.4975,
+    "pixel_auroc": 0.8731447059707607,
+    "aupro_30": 0.5891299406720636,
+    "accuracy_at_threshold": 0.21,
+    "recall_at_threshold": 0.0125,
+    "false_alarm_rate": 0.0,
+    "latency_ms_median": 894.7590500029037,
+    "bank_size": 40000
+  },
+  "bagel": {
+    "n_test": 110,
+    "image_auroc": 0.9736570247933884,
+    "pixel_auroc": 0.8930869650395042,
+    "aupro_30": 0.861483609732886,
+    "accuracy_at_threshold": 0.9272727272727272,
+    "recall_at_threshold": 0.9204545454545454,
+    "false_alarm_rate": 0.045454545454545456,
+    "latency_ms_median": 830.1967500156024,
+    "bank_size": 40000
+  },
+  "peach": {
+    "n_test": 132,
+    "image_auroc": 0.9727866473149491,
+    "pixel_auroc": 0.9232847518978091,
+    "aupro_30": 0.860697749895622,
+    "accuracy_at_threshold": 0.3560606060606061,
+    "recall_at_threshold": 0.19811320754716982,
+    "false_alarm_rate": 0.0,
+    "latency_ms_median": 476.9852000026731,
+    "bank_size": 40000
+  },
+  "cable_gland": {
+    "n_test": 108,
+    "image_auroc": 0.6535303776683088,
+    "pixel_auroc": 0.9023493197051462,
+    "aupro_30": 0.7723417732420553,
+    "accuracy_at_threshold": 0.2777777777777778,
+    "recall_at_threshold": 0.12643678160919541,
+    "false_alarm_rate": 0.09523809523809523,
+    "latency_ms_median": 373.9511500025401,
+    "bank_size": 40000
+  },
+  "potato": {
+    "n_test": 114,
+    "image_auroc": 0.9896245059288538,
+    "pixel_auroc": 0.983547365634698,
+    "aupro_30": 0.9608554815576903,
+    "accuracy_at_threshold": 0.6666666666666666,
+    "recall_at_threshold": 0.5869565217391305,
+    "false_alarm_rate": 0.0,
+    "latency_ms_median": 494.6639500121819,
+    "bank_size": 40000
+  },
+  "carrot": {
+    "n_test": 159,
+    "image_auroc": 0.9486531986531987,
+    "pixel_auroc": 0.9554063790650126,
+    "aupro_30": 0.9202326794695919,
+    "accuracy_at_threshold": 0.7924528301886793,
+    "recall_at_threshold": 0.7651515151515151,
+    "false_alarm_rate": 0.07407407407407407,
+    "latency_ms_median": 546.6343000007328,
+    "bank_size": 40000
+  },
+  "rope": {
+    "n_test": 101,
+    "image_auroc": 0.9891304347826086,
+    "pixel_auroc": 0.8900885382853927,
+    "aupro_30": 0.7986967089453153,
+    "accuracy_at_threshold": 0.9702970297029703,
+    "recall_at_threshold": 0.9855072463768116,
+    "false_alarm_rate": 0.0625,
+    "latency_ms_median": 471.27589999581687,
+    "bank_size": 40000
+  },
+  "cookie": {
+    "n_test": 131,
+    "image_auroc": 0.9802357836338418,
+    "pixel_auroc": 0.8453998919786938,
+    "aupro_30": 0.8071734166188507,
+    "accuracy_at_threshold": 0.9389312977099237,
+    "recall_at_threshold": 0.9611650485436893,
+    "false_alarm_rate": 0.14285714285714285,
+    "latency_ms_median": 500.1586000144016,
+    "bank_size": 40000
+  },
+  "tire": {
+    "n_test": 112,
+    "image_auroc": 0.40505747126436775,
+    "pixel_auroc": 0.9392209866307559,
+    "aupro_30": 0.8190608663295307,
+    "accuracy_at_threshold": 0.21428571428571427,
+    "recall_at_threshold": 0.022988505747126436,
+    "false_alarm_rate": 0.12,
+    "latency_ms_median": 618.4390999842435,
+    "bank_size": 40000
+  },
+  "dowel": {
+    "n_test": 130,
+    "image_auroc": 0.926405325443787,
+    "pixel_auroc": 0.8175786512920618,
+    "aupro_30": 0.7070677556750486,
+    "accuracy_at_threshold": 0.6538461538461539,
+    "recall_at_threshold": 0.5769230769230769,
+    "false_alarm_rate": 0.038461538461538464,
+    "latency_ms_median": 319.7860999935074,
+    "bank_size": 40000
+  }
+}

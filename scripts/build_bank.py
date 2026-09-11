@@ -24,7 +24,7 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=ROOT / "models")
     ap.add_argument("--categories", nargs="+", default=list(CATEGORIES), choices=CATEGORIES)
     ap.add_argument("--max-train", type=int, default=None, help="cap training scans (for quick runs)")
-    ap.add_argument("--percentile", type=float, default=99.0, help="validation percentile for threshold")
+    ap.add_argument("--percentile", type=float, default=95.0, help="validation percentile for threshold")
     ap.add_argument("--target-points", type=int, default=3000, help="per-category point budget (0 = fixed voxel)")
     ap.add_argument("--voxel", type=float, default=0.002, help="fixed voxel size in m when --target-points 0")
     args = ap.parse_args()

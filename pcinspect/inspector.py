@@ -66,7 +66,7 @@ class Inspector:
                               coreset_size=cfg.coreset_size)
         return cls(bank, cfg)
 
-    def calibrate(self, val_scans: list[np.ndarray], percentile: float = 99.0, margin: float = 1.0) -> float:
+    def calibrate(self, val_scans: list[np.ndarray], percentile: float = 95.0, margin: float = 1.0) -> float:
         """Set the pass/fail threshold from defect-free validation scans."""
         scores = np.array([self.inspect(x).image_score for x in val_scans])
         self.threshold = float(np.percentile(scores, percentile) * margin)
