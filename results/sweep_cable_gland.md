@@ -1,8 +1,10 @@
-# Sweep: cable_gland
+# Sweep: cable_gland (point budget), corrected AUPRO
 
-| Setting | Voxel (mm) | I-AUROC | P-AUROC | AUPRO@30% | Acc@thr | Latency (ms) | Time (s) |
-|---|---|---|---|---|---|---|---|
-| tp0_topk0.01 | 2.00 | 0.633 | 0.899 | 0.286 | 0.269 | 135 | 84 |
-| tp3000_topk0.01 | 1.00 | 0.644 | 0.902 | 0.321 | 0.278 | 333 | 114 |
-| tp6000_topk0.01 | 0.71 | 0.626 | 0.903 | 0.329 | 0.324 | 866 | 199 |
-| tp12000_topk0.01 | 0.50 | 0.545 | 0.907 | 0.344 | 0.194 | 1185 | 264 |
+| Target points | Voxel (mm) | I-AUROC | P-AUROC | AUPRO@30% | Acc@thr | Latency (ms) |
+|---|---|---|---|---|---|---|
+| fixed 2 mm | 2.00 | 0.633 | 0.899 | 0.736 | 0.269 | 134 |
+| 3000 | 1.00 | 0.644 | 0.902 | 0.771 | 0.287 | 378 |
+| 6000 | 0.71 | 0.627 | 0.903 | 0.779 | 0.324 | 938 |
+| 12000 | 0.50 | 0.545 | 0.907 | 0.794 | 0.194 | 1273 |
+
+Chosen default: 3000 points (best I-AUROC, +0.035 AUPRO over fixed voxel, <0.4 s/scan).

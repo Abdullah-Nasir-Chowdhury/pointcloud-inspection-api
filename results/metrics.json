@@ -42,5 +42,16 @@
     "false_alarm_rate": 0.14285714285714285,
     "latency_ms_median": 901.1284000007436,
     "bank_size": 40000
+  },
+  "dowel": {
+    "n_test": 130,
+    "image_auroc": 0.8254437869822485,
+    "pixel_auroc": 0.8173486144510633,
+    "aupro_30": 0.156826092972233,
+    "accuracy_at_threshold": 0.5,
+    "recall_at_threshold": 0.3942307692307692,
+    "false_alarm_rate": 0.07692307692307693,
+    "latency_ms_median": 488.9552999957232,
+    "bank_size": 40000
   }
 }

@@ -21,7 +21,7 @@ class InspectorConfig:
     topk_fraction: float = 0.01    # image score = mean of the top 1% point scores
     max_per_sample: int | None = 1000
     coreset_size: int | None = 40000
-    target_points: int | None = 6000   # if set, voxel_size is chosen per category at fit time
+    target_points: int | None = 3000   # if set, voxel_size is chosen per category at fit time
 
 
 @dataclass
