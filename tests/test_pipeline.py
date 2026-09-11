@@ -26,6 +26,19 @@ def test_preprocess_removes_table_keeps_object():
     assert pre.shape == (160, 160)
 
 
+def test_outlier_removal_drops_floating_points():
+    xyz, _ = make_scan()
+    # Sprinkle stray points floating 1 cm above the dome, like sensor noise at hole edges.
+    rng = np.random.default_rng(3)
+    ys, xs = rng.integers(60, 100, 15), rng.integers(60, 100, 15)
+    xyz[ys, xs, 2] -= 0.01
+    pre_off = preprocess(xyz, PreprocessConfig(outlier_min_fraction=0.0))
+    pre_on = preprocess(xyz)
+    assert len(pre_on.down_points) < len(pre_off.down_points)
+    # The floating points (much closer to the camera than the dome apex) must be gone.
+    assert pre_on.down_points[:, 2].min() > pre_off.down_points[:, 2].min() + 0.005
+
+
 def test_preprocess_rejects_empty():
     with pytest.raises(EmptyScanError):
         preprocess(np.zeros((32, 32, 3), np.float32))

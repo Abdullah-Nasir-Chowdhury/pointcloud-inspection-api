@@ -35,6 +35,8 @@ class PreprocessConfig:
     normal_max_nn: int = 30
     min_points: int = 200             # below this the scan is rejected as empty
     seed: int = 0                     # RANSAC seed
+    outlier_radius_mult: float = 5.0  # neighbourhood radius for outlier removal = mult * voxel (matches FPFH)
+    outlier_min_fraction: float = 0.25  # drop points with < fraction * median neighbour count (0 disables)
 
 
 class EmptyScanError(ValueError):
@@ -94,6 +96,20 @@ def choose_voxel_size(scans: list[np.ndarray], target_points: int, cfg: Preproce
     return float(np.clip(probe_voxel * np.sqrt(n / target_points), lo, hi))
 
 
+def remove_sparse_points(down: o3d.geometry.PointCloud, radius: float, min_fraction: float) -> o3d.geometry.PointCloud:
+    """Drop floating points whose neighbourhood is far sparser than the surface's.
+
+    Why: structured-light sensors return stray points at the edges of no-return holes (black
+    rubber, specular metal). Their FPFH neighbourhoods are truncated, so they get huge anomaly
+    scores on perfectly good parts. On tire this alone inverted detection (I-AUROC 0.42):
+    97-100% of the top-scoring points on good scans had < 25% of the median neighbour count.
+    """
+    pts = np.asarray(down.points)
+    counts = np.asarray([len(n) for n in cKDTree(pts).query_ball_point(pts, radius)])
+    thresh = max(3, int(min_fraction * np.median(counts)))
+    return down.select_by_index(np.flatnonzero(counts >= thresh))
+
+
 def preprocess(xyz: np.ndarray, cfg: PreprocessConfig = PreprocessConfig()) -> Preprocessed:
     H, W = xyz.shape[:2]
     points, pix_idx = organized_to_points(xyz)
@@ -107,6 +123,10 @@ def preprocess(xyz: np.ndarray, cfg: PreprocessConfig = PreprocessConfig()) -> P
 
     pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
     down = pcd.voxel_down_sample(cfg.voxel_size)
+    if cfg.outlier_min_fraction > 0:
+        down = remove_sparse_points(down, cfg.voxel_size * cfg.outlier_radius_mult, cfg.outlier_min_fraction)
+    if len(down.points) < 10:
+        raise EmptyScanError("too few points after outlier removal")
     down.estimate_normals(
         o3d.geometry.KDTreeSearchParamHybrid(
             radius=cfg.voxel_size * cfg.normal_radius_mult, max_nn=cfg.normal_max_nn
