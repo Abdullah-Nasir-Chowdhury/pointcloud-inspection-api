@@ -38,12 +38,14 @@ def get(cat: str) -> Inspector:
     return _cache[cat]
 
 
-def depth_image(xyz: np.ndarray) -> np.ndarray:
+def depth_image(xyz: np.ndarray, obj: np.ndarray | None = None) -> np.ndarray:
+    """Depth as grey; contrast stretched over the object so its shape is visible, not the table."""
     z = xyz[..., 2]
     valid = (xyz != 0).any(-1)
     if not valid.any():
         return np.zeros(z.shape, np.uint8)
-    lo, hi = np.percentile(z[valid], [1, 99])
+    ref = valid & obj if obj is not None and (valid & obj).any() else valid
+    lo, hi = np.percentile(z[ref], [1, 99])
     g = np.clip((z - lo) / max(hi - lo, 1e-9), 0, 1)
     g = (255 * (1 - g)).astype(np.uint8)   # closer = brighter
     g[~valid] = 0
@@ -61,7 +63,9 @@ def colorize(heat: np.ndarray, vmax: float) -> np.ndarray:
 def overlay(depth: np.ndarray, heat: np.ndarray, vmax: float) -> np.ndarray:
     base = np.stack([depth] * 3, -1).astype(np.float32)
     col = colorize(heat, vmax).astype(np.float32)
-    a = np.clip(heat / max(vmax, 1e-9), 0, 1)[..., None] * 0.85
+    # Transparent below a third of the colour range so baseline scores do not tint the whole part.
+    t = np.clip(heat / max(vmax, 1e-9), 0, 1)
+    a = np.clip((t - 0.33) / 0.67, 0, 1)[..., None] * 0.9
     return (base * (1 - a) + col * a).astype(np.uint8)
 
 
@@ -84,7 +88,7 @@ def inspect(file, category: str):
         raise gr.Error(str(e)) from e
     ms = (time.perf_counter() - t0) * 1000
     vmax = (r.threshold or float(r.heatmap.max()) or 1.0) * 1.5
-    depth = depth_image(xyz)
+    depth = depth_image(xyz, r.heatmap > 0)
     verdict = "FAIL: defect detected" if r.is_defective else "PASS: no defect found"
     summary = (f"## {verdict}\n\n| | |\n|---|---|\n| Anomaly score | {r.image_score:.2f} |\n"
                f"| Threshold | {r.threshold:.2f} |\n| Object points | {r.n_points:,} |\n"
@@ -119,7 +123,7 @@ def build() -> gr.Blocks:
         btn.click(inspect, [f, c], [d, o, h, out_md])
         if examples:
             gr.Examples([[str(p), p.stem.split("__")[0]] for p in examples], inputs=[f, c],
-                        outputs=[d, o, h, out_md], fn=inspect, cache_examples=False,
+                        outputs=[d, o, h, out_md], fn=inspect, cache_examples=False, run_on_click=True,
                         label="Examples (MVTec 3D-AD, CC BY-NC-SA 4.0)")
         gr.Markdown("Example scans are from the [MVTec 3D-AD dataset](https://www.mvtec.com/company/research/datasets/mvtec-3d-ad) "
                     "(Bergmann et al. 2022), CC BY-NC-SA 4.0, used here for non-commercial demonstration.")
