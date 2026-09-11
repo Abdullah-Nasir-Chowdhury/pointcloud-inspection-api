@@ -36,15 +36,15 @@ Reference numbers to beat or match (BTF, FPFH only): I-AUROC 0.865, AUPRO 0.924.
 
 ## Deliverables (per the checklist standards)
 
-- [ ] `pcinspect` package: data loader, preprocessing, FPFH features, memory-bank scorer
-- [ ] `scripts/build_bank.py`, `scripts/evaluate.py`, `scripts/benchmark.py`
-- [ ] FastAPI service: `POST /inspect` (tiff/ply upload -> JSON score + heatmap PNG),
+- [x] `pcinspect` package: data loader, preprocessing, FPFH features, memory-bank scorer
+- [x] `scripts/build_bank.py`, `scripts/evaluate.py`, `scripts/benchmark.py`
+- [x] FastAPI service: `POST /inspect` (tiff/ply upload -> JSON score + heatmap PNG),
       `GET /health`, `GET /categories`
 - [ ] Dockerfile (python:3.11-slim, CPU only) and `docker compose up`
 - [ ] Hugging Face Space (Gradio front end over the same scorer) as the live demo
 - [ ] README: client problem, results table, run steps, 60-90 s GIF
 - [ ] Benchmark table and one client-facing paragraph for proposals
-- [ ] Tests: loader, preprocessing invariants, API round trip on a synthetic sample
+- [x] Tests: loader, preprocessing invariants, API round trip on a synthetic sample
 
 ## Milestones
 
