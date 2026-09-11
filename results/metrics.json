@@ -9,5 +9,38 @@
     "false_alarm_rate": 0.045454545454545456,
     "latency_ms_median": 1026.012250018539,
     "bank_size": 40000
+  },
+  "cable_gland": {
+    "n_test": 108,
+    "image_auroc": 0.6688560481663931,
+    "pixel_auroc": 0.8990362604007343,
+    "aupro_30": 0.28846204308410184,
+    "accuracy_at_threshold": 0.2777777777777778,
+    "recall_at_threshold": 0.10344827586206896,
+    "false_alarm_rate": 0.0,
+    "latency_ms_median": 123.27884999103844,
+    "bank_size": 40000
+  },
+  "carrot": {
+    "n_test": 159,
+    "image_auroc": 0.9208754208754208,
+    "pixel_auroc": 0.954326110315695,
+    "aupro_30": 0.16799926425404466,
+    "accuracy_at_threshold": 0.6855345911949685,
+    "recall_at_threshold": 0.6287878787878788,
+    "false_alarm_rate": 0.037037037037037035,
+    "latency_ms_median": 341.72229998512194,
+    "bank_size": 40000
+  },
+  "cookie": {
+    "n_test": 131,
+    "image_auroc": 0.9726074895977809,
+    "pixel_auroc": 0.8436890229345438,
+    "aupro_30": 0.8042619228621801,
+    "accuracy_at_threshold": 0.9312977099236641,
+    "recall_at_threshold": 0.9514563106796117,
+    "false_alarm_rate": 0.14285714285714285,
+    "latency_ms_median": 901.1284000007436,
+    "bank_size": 40000
   }
 }

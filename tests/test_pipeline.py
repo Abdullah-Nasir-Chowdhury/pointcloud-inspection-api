@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
 
-from pcinspect.inspector import Inspector
+from pcinspect.inspector import Inspector, InspectorConfig
+from pcinspect.preprocess import choose_voxel_size, PreprocessConfig
 from pcinspect.models.memory_bank import MemoryBank, greedy_coreset
 from pcinspect.preprocess import EmptyScanError, organized_to_points, preprocess
 from tests.synthetic import make_scan
@@ -44,10 +45,23 @@ def test_memory_bank_roundtrip(tmp_path):
     assert np.allclose(b2.score(bank.features[:5]), 0.0, atol=1e-4)
 
 
+def test_choose_voxel_size_hits_target():
+    scans = [make_scan(seed=s)[0] for s in range(3)]
+    cfg = PreprocessConfig()
+    v = choose_voxel_size(scans, target_points=2000, cfg=cfg)
+    assert 0.0005 <= v <= 0.005
+    from pcinspect.preprocess import preprocess
+    n = len(preprocess(scans[0], PreprocessConfig(voxel_size=v)).down_points)
+    assert 1000 < n < 4000, n   # within a factor of two of the target
+
+
 def test_dent_scores_higher_than_good(tmp_path):
+    # Fixed 2 mm voxel: the synthetic sensor pitch is 0.6 mm, so the adaptive voxel would
+    # land near the pixel pitch and make normals noisy. This test is about the mechanics.
+    cfg = InspectorConfig(target_points=None)
     train = [make_scan(seed=s)[0] for s in range(4)]
-    insp = Inspector.fit(train)
-    insp.calibrate([make_scan(seed=s)[0] for s in range(10, 14)])
+    insp = Inspector.fit(train, cfg)
+    insp.calibrate([make_scan(seed=s)[0] for s in range(10, 18)])
     good = insp.inspect(make_scan(seed=99)[0])
     bad_xyz, gt = make_scan(dent=True, seed=100)
     bad = insp.inspect(bad_xyz)

@@ -58,6 +58,13 @@ def aupro(gts: list[np.ndarray], maps: list[np.ndarray], fpr_limit: float = 0.3,
         pros.append(float(np.mean(overlaps)) if overlaps else 0.0)
         if fpr >= fpr_limit:
             break
+    else:
+        # Thresholds ran out before reaching the FPR limit. This happens when many pixels tie
+        # at the minimum score (our background is exactly 0): the final operating point is
+        # "predict everything", FPR = 1, PRO = 1, and the curve is linear in between (tie
+        # handling identical to a ROC curve).
+        fprs.append(1.0)
+        pros.append(1.0)
     fprs, pros = np.asarray(fprs), np.asarray(pros)
     if fprs[-1] > fpr_limit:   # interpolate the last point onto the limit
         pros[-1] = np.interp(fpr_limit, fprs[-2:], pros[-2:])

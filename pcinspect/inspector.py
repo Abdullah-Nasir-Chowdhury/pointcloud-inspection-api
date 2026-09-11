@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -10,7 +10,7 @@ from scipy.ndimage import gaussian_filter
 
 from .features.fpfh import FPFHConfig, compute_fpfh
 from .models.memory_bank import MemoryBank
-from .preprocess import PreprocessConfig, Preprocessed, preprocess
+from .preprocess import PreprocessConfig, Preprocessed, choose_voxel_size, preprocess
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,7 @@ class InspectorConfig:
     topk_fraction: float = 0.01    # image score = mean of the top 1% point scores
     max_per_sample: int | None = 1000
     coreset_size: int | None = 40000
+    target_points: int | None = 6000   # if set, voxel_size is chosen per category at fit time
 
 
 @dataclass
@@ -57,6 +58,9 @@ class Inspector:
     # ---- training -------------------------------------------------------------------
     @classmethod
     def fit(cls, train_scans: list[np.ndarray], cfg: InspectorConfig = InspectorConfig()) -> "Inspector":
+        if cfg.target_points:
+            v = choose_voxel_size(train_scans[:8], cfg.target_points, cfg.pre)
+            cfg = replace(cfg, pre=replace(cfg.pre, voxel_size=v))
         feats = [extract_features(x, cfg)[1] for x in train_scans]
         bank = MemoryBank.fit(feats, max_per_sample=cfg.max_per_sample,
                               coreset_size=cfg.coreset_size)

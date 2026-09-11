@@ -26,6 +26,21 @@ Try: load one scan, print `xyz.shape`, count zero pixels, and plot `xyz[..., 2]`
 
 Try: change `voxel_size` to 0.001 and 0.004 and watch bank size and latency change.
 
+### 2b. A real debugging story: resolution normalisation
+
+First full run (fixed 2 mm voxel): bagel I-AUROC 0.990, cable gland 0.669 with AUPRO 0.288.
+Diagnosis steps, in order, each one a script you can re-run:
+1. Check preprocessing per category (object points, plane found, ground-truth coverage): fine everywhere.
+2. Check score distributions (validation vs good test vs each defect type): total overlap for cable gland.
+3. Check *where* the hottest points are on a good scan (near the plane cut? no).
+4. Count points: bagel 4,300 downsampled points, cable gland 1,000, dowel 350. Same voxel, four
+   times less resolution for the small part, and FPFH radius (5 voxels = 10 mm) covers a large
+   fraction of a 3 cm object.
+Fix: choose the voxel size per category so every part gets ~6,000 points
+(`choose_voxel_size` in `pcinspect/preprocess.py`; surface point count scales with 1/voxel^2).
+Lesson: when one category fails, measure before tuning. The first three checks ruled out the
+obvious suspects in ten minutes and pointed at the real one.
+
 ## 3. FPFH descriptors (`pcinspect/features/fpfh.py`)
 
 Fast Point Feature Histograms (Rusu 2009) describe local surface shape around a point as a
@@ -41,9 +56,11 @@ far from every stored feature is anomalous. Score = nearest-neighbour distance. 
 no labels, one hyperparameter (bank size).
 
 - **FAISS** does brute-force nearest neighbour fast on CPU. `IndexFlatL2` is exact.
-- **Greedy coreset** (k-center) picks a subset that covers the feature space evenly, so we can
-  shrink the bank 10x with little loss. It is optional here; random per-scan capping is the
-  default because it is fast. Try turning `coreset_fraction=0.1` on and compare AUROC.
+- **Greedy coreset** (k-center) picks a subset that covers the feature space evenly. Measured on
+  bagel: the full 975k-entry bank and a 40k coreset both give I-AUROC 0.990 and AUPRO 0.87, but
+  search drops from 14 s to 1 s per scan and the model file from 129 MB to 5 MB. Search time is
+  linear in bank size (`IndexFlatL2` is exact brute force), which is why this matters.
+  Try `coreset_size=10000` and see whether accuracy holds.
 
 ## 5. From point scores to a decision (`pcinspect/inspector.py`)
 

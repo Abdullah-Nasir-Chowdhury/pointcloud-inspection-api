@@ -76,6 +76,24 @@ def remove_background_plane(points: np.ndarray, cfg: PreprocessConfig) -> tuple[
     return keep, plane
 
 
+def choose_voxel_size(scans: list[np.ndarray], target_points: int, cfg: PreprocessConfig,
+                      probe_voxel: float = 0.001, lo: float = 0.0005, hi: float = 0.005) -> float:
+    """Pick a voxel size so a typical object yields about `target_points` downsampled points.
+
+    Why: FPFH neighbourhoods are defined in voxels, so a fixed 2 mm voxel gives a bagel
+    4,000 points but a cable gland 1,000. Normalising the point budget per category makes
+    small parts as well resolved as large ones. Surface point count scales ~ 1/voxel^2.
+    """
+    counts = []
+    for xyz in scans:
+        points, _ = organized_to_points(xyz)
+        keep, _ = remove_background_plane(points, cfg)
+        pcd = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points[keep]))
+        counts.append(len(pcd.voxel_down_sample(probe_voxel).points))
+    n = float(np.median(counts))
+    return float(np.clip(probe_voxel * np.sqrt(n / target_points), lo, hi))
+
+
 def preprocess(xyz: np.ndarray, cfg: PreprocessConfig = PreprocessConfig()) -> Preprocessed:
     H, W = xyz.shape[:2]
     points, pix_idx = organized_to_points(xyz)
