@@ -63,23 +63,25 @@ def main() -> None:
     import gradio
     gv = gradio.__version__
 
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
+    # Clear contents rather than the folder itself: on Windows an open shell inside OUT
+    # blocks rmtree of the directory but not of its children.
+    OUT.mkdir(parents=True, exist_ok=True)
+    for child in OUT.iterdir():
+        shutil.rmtree(child) if child.is_dir() else child.unlink()
     shutil.copytree(ROOT / "pcinspect", OUT / "pcinspect",
                     ignore=shutil.ignore_patterns("__pycache__", "api"))
     shutil.copy(ROOT / "demo" / "app.py", OUT / "app.py")
     shutil.copytree(ROOT / "demo" / "examples", OUT / "examples")
     for cat in sorted(p for p in args.models.iterdir() if (p / "bank.npz").exists()):
         shutil.copytree(cat, OUT / "models" / cat.name)
-    (OUT / "README.md").write_text(README.format(gradio_version=gv))
-    (OUT / "requirements.txt").write_text(REQUIREMENTS.format(gradio_version=gv))
+    (OUT / "README.md").write_text(README.format(gradio_version=gv), encoding="utf-8")
+    (OUT / "requirements.txt").write_text(REQUIREMENTS.format(gradio_version=gv), encoding="utf-8")
     # app.py resolves models relative to its own folder and imports pcinspect from its parent;
     # in the Space both live next to app.py, so point it there.
-    app = (OUT / "app.py").read_text()
+    app = (OUT / "app.py").read_text(encoding="utf-8")
     app = app.replace('sys.path.insert(0, str(HERE.parent))', 'sys.path.insert(0, str(HERE))')
     app = app.replace('HERE.parent / "models"', 'HERE / "models"')
-    (OUT / "app.py").write_text(app)
+    (OUT / "app.py").write_text(app, encoding="utf-8")
     size = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file()) / 1e6
     print(f"assembled {OUT} ({size:.0f} MB)")
 
