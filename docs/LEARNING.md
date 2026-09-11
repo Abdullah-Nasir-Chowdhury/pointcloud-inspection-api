@@ -55,6 +55,12 @@ at 25% of the median neighbour count so it adapts to every category (`remove_spa
 Lesson: localisation and detection metrics disagreeing is itself a clue. Ask what differs
 between images, not within them.
 
+Follow-up: outlier removal did not rescue tire (0.396). Seven image-score aggregates were then
+compared offline on the same banks (`results/image_score_variants.md`); none of the peak-based
+ones beat chance on tire, only the whole-scan mean (0.63). That is the signature of a feature
+that cannot see the defect, not a scoring bug, so tire is documented as a failure case and the
+time went to shipping. Knowing when to stop tuning is part of the job.
+
 ### 2d. The pass/fail threshold is a business decision
 
 The threshold is a percentile of image scores on defect-free validation scans. With 20-40
