@@ -15,8 +15,10 @@ Vercel tried to build this and asked for a FastAPI entrypoint. Adding it would n
 | Vercel Python function limit | 250 MB uncompressed |
 
 Serverless Python hosts (Vercel, Netlify, AWS Lambda without containers) cannot hold Open3D.
-The same applies to the 512 MB RAM tiers of Render and Railway: importing Open3D plus one
-40k-entry FAISS bank sits around 600-800 MB resident. This needs a container with 1-2 GB RAM.
+
+Measured memory of the serving process (uvicorn + API + Gradio mounted): 203 MB idle, 246 MB
+after inspecting scans from three categories with heatmaps. So 512 MB container tiers do fit;
+their limit is CPU (0.1 vCPU on free plans), not RAM.
 
 ## Google Cloud Run (recommended, free tier)
 
@@ -60,6 +62,15 @@ curl -F "file=@demo/examples/bagel__hole_000.tiff" "localhost:8000/inspect?categ
 
 Expected image size: about 1.3 GB (Open3D dominates). `.dockerignore` keeps the dataset out
 of the build context.
+
+## Render free tier (no card, slower)
+
+Render's free web service (512 MB RAM, 0.1 CPU, sleeps after 15 min idle, no credit card)
+can run the same Dockerfile straight from the GitHub repo: New > Web Service > connect the repo,
+runtime Docker, instance type Free. Render sets `$PORT`, which the Dockerfile already honours.
+Expect a 1-3 minute cold start (image pull + Open3D import on a tenth of a core) and several
+seconds per scan. Fine as a fallback demo; put the Cloud Run URL first in the README while it
+is alive.
 
 ## Alternatives
 
