@@ -5,7 +5,7 @@ data/
 !data/README.md
 runs/
 *.npy
-*.npz
+!models/**/bank.npz
 *.pth
 *.pt
 .pytest_cache/

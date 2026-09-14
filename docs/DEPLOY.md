@@ -20,6 +20,8 @@ The same applies to the 512 MB RAM tiers of Render and Railway: importing Open3D
 
 ## Google Cloud Run (recommended, free tier)
 
+Deployed 2026-09-15: https://pcinspect-727953311125.asia-northeast1.run.app (project `pcinspect-508620`, region asia-northeast1).
+
 Free tier: 2 million requests and 360,000 GB-seconds per month, which covers a portfolio demo
 with instances scaled to zero. Cold start is 10-20 s (Open3D import); warm requests ~0.5 s.
 
@@ -32,7 +34,17 @@ gcloud run deploy pcinspect --source . --region asia-northeast1 --allow-unauthen
 ```
 
 `--source .` builds the Dockerfile remotely, so Docker Desktop is not even required for this
-path. The command prints the service URL; `/demo` is the UI, `/docs` the API explorer. Put the
+path.
+
+On a fresh project the first deploy fails with `PERMISSION_DENIED ... default service account is
+missing required IAM permissions`: Cloud Build runs as the Compute Engine default service
+account, which starts with no roles. Grant it once (replace the project number):
+
+```bash
+gcloud projects add-iam-policy-binding PROJECT_ID --member="serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/cloudbuild.builds.builder"
+```
+
+then re-run the deploy. The command prints the service URL; `/demo` is the UI, `/docs` the API explorer. Put the
 URL in the README.
 
 Redeploy after changes: re-run the same command.

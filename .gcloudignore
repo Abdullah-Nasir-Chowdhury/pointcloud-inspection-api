@@ -1,0 +1,15 @@
+# Upload filter for `gcloud run deploy --source .` (explicit, so .gitignore's *.npz rule
+# cannot drop the model banks). Mirrors .dockerignore.
+.gcloudignore
+.git/
+.gitignore
+data/
+runs/
+results/
+assets/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+docs/
+tests/

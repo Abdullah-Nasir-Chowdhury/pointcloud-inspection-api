@@ -3,6 +3,8 @@
 Upload a 3D scan of a manufactured part, get back an anomaly heatmap and a calibrated
 pass/fail decision. No defect labels needed: the model learns from defect-free scans only.
 
+**Live demo:** [https://pcinspect-727953311125.asia-northeast1.run.app/demo](https://pcinspect-727953311125.asia-northeast1.run.app/demo) (Cloud Run, scales to zero: first load takes 15-20 s) | **API docs:** [https://pcinspect-727953311125.asia-northeast1.run.app/docs](https://pcinspect-727953311125.asia-northeast1.run.app/docs)
+
 ![bagel results](assets/bagel.png)
 
 *Bagel category of MVTec 3D-AD: RGB, depth, anomaly heatmap, ground truth. Contamination,
@@ -118,7 +120,7 @@ docker build -t pcinspect . && docker run -p 8000:8000 pcinspect
 
 Cloud Run one-liner and why serverless hosts (Vercel, Lambda) cannot run this (Open3D's Linux
 wheel alone is 448 MB against a 250 MB function limit): see [docs/DEPLOY.md](docs/DEPLOY.md).
-Hosted demo URL: coming once deployed.
+Hosted on Google Cloud Run: [https://pcinspect-727953311125.asia-northeast1.run.app/demo](https://pcinspect-727953311125.asia-northeast1.run.app/demo).
 
 ## Tests
 

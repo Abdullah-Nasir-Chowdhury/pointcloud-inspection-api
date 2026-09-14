@@ -41,7 +41,7 @@ Reference numbers to beat or match (BTF, FPFH only): I-AUROC 0.865, AUPRO 0.924.
 - [x] FastAPI service: `POST /inspect` (tiff/ply upload -> JSON score + heatmap PNG),
       `GET /health`, `GET /categories`
 - [x] Dockerfile (python:3.11-slim, CPU only); build blocked until Docker Desktop is installed
-- [~] Live demo: Gradio mounted at /demo inside the API container; Vercel ruled out (Open3D 448 MB > 250 MB limit), HF Spaces needs PRO. Target: Google Cloud Run free tier, see docs/DEPLOY.md
+- [x] Live demo on Cloud Run (2026-09-15): https://pcinspect-727953311125.asia-northeast1.run.app/demo
 - [ ] README: client problem, results table, run steps, 60-90 s GIF
 - [x] Benchmark table and one client-facing paragraph for proposals (`docs/CLIENT_PARAGRAPH.md`)
 - [x] Tests: loader, preprocessing invariants, API round trip on a synthetic sample
