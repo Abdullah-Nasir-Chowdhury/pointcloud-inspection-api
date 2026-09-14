@@ -1,0 +1,12 @@
+# Keep the 24 GB dataset and local artefacts out of the build context.
+data/
+runs/
+results/
+assets/
+.venv/
+.git/
+__pycache__/
+*.pyc
+.pytest_cache/
+docs/
+tests/

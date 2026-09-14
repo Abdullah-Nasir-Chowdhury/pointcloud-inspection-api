@@ -105,10 +105,20 @@ uvicorn pcinspect.api.app:app --port 8000
 curl -F "file=@scan.tiff" "localhost:8000/inspect?category=bagel"
 ```
 
-Docker: `docker build -t pcinspect . && docker run -p 8000:8000 pcinspect`
+The fitted banks for all ten categories are committed under `models/` (35 MB), so the API and
+demo work straight from a checkout.
 
-Demo UI (Gradio): `python demo/app.py`. A ready-to-upload Hugging Face Space is produced by
-`python scripts/build_space.py` (hosted URL to follow; HF now requires a PRO plan for Gradio Spaces).
+## Deploy
+
+One container serves the API (`/docs`) and the Gradio demo (`/demo`):
+
+```bash
+docker build -t pcinspect . && docker run -p 8000:8000 pcinspect
+```
+
+Cloud Run one-liner and why serverless hosts (Vercel, Lambda) cannot run this (Open3D's Linux
+wheel alone is 448 MB against a 250 MB function limit): see [docs/DEPLOY.md](docs/DEPLOY.md).
+Hosted demo URL: coming once deployed.
 
 ## Tests
 
@@ -126,8 +136,10 @@ pcinspect/            package: data loader, preprocess, features/fpfh, models/me
                       inspector, metrics, api/app
 scripts/              download, build_bank, evaluate, run_all, sweep, benchmark, make_figure,
                       build_space
+models/               fitted banks + thresholds, one folder per category (5 MB each)
 demo/                 Gradio app + example scans
-docs/PLAN.md          milestones;  docs/LEARNING.md  concepts, debugging stories, reading list
+docs/PLAN.md          milestones;  docs/LEARNING.md  concepts, debugging stories, reading list;
+                      docs/DEPLOY.md  Cloud Run / Docker / hosting notes
 results/              metrics, sweeps, ablations
 ```
 

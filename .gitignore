@@ -14,4 +14,3 @@ runs/
 results/tmp_*/
 results/*.log
 results/bagel_coreset/
-models/

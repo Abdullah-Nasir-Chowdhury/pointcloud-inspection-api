@@ -2,6 +2,7 @@
 
 Run:  uvicorn pcinspect.api.app:app --host 0.0.0.0 --port 8000
 Env:  PCINSPECT_MODELS=path/to/models   (one sub-folder per category, each with bank.npz + meta.json)
+      PCINSPECT_DEMO=path/to/demo       (optional; if gradio is installed the UI is mounted at /demo)
 """
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import tifffile
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
-from fastapi.responses import Response
+from fastapi.responses import RedirectResponse, Response
 from PIL import Image
 from pydantic import BaseModel
 
@@ -22,6 +23,7 @@ from ..inspector import InspectionResult, Inspector
 from ..preprocess import EmptyScanError
 
 MODELS_DIR = Path(os.environ.get("PCINSPECT_MODELS", "models"))
+DEMO_DIR = Path(os.environ.get("PCINSPECT_DEMO", Path(__file__).resolve().parents[2] / "demo"))
 
 app = FastAPI(
     title="Point Cloud Defect Inspection API",
@@ -141,3 +143,33 @@ async def inspect_heatmap(
     return Response(heatmap_png(res), media_type="image/png",
                     headers={"X-Image-Score": f"{res.image_score:.6f}",
                              "X-Is-Defective": str(res.is_defective)})
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse("/demo" if _demo_mounted else "/docs")
+
+
+def _mount_demo() -> bool:
+    """Serve the Gradio UI at /demo from the same process, so one container is API + demo.
+
+    Why: a client-facing demo and a machine-facing API on one URL, one deploy, one set of
+    loaded models. Gradio is optional: the API works without it.
+    """
+    try:
+        import gradio as gr  # noqa: F401
+    except ImportError:
+        return False
+    if not (DEMO_DIR / "app.py").exists():
+        return False
+    import importlib.util
+    import sys
+    spec = importlib.util.spec_from_file_location("pcinspect_demo_app", DEMO_DIR / "app.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["pcinspect_demo_app"] = mod
+    spec.loader.exec_module(mod)
+    gr.mount_gradio_app(app, mod.build(), path="/demo")
+    return True
+
+
+_demo_mounted = _mount_demo()

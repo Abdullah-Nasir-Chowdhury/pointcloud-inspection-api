@@ -1,0 +1,26 @@
+{
+  "threshold": 35.084397888183595,
+  "config": {
+    "pre": {
+      "plane_dist_thresh": 0.004,
+      "plane_ransac_iters": 1000,
+      "min_object_fraction": 0.02,
+      "voxel_size": 0.0008985172971809354,
+      "normal_radius_mult": 2.5,
+      "normal_max_nn": 30,
+      "min_points": 200,
+      "seed": 0,
+      "outlier_radius_mult": 5.0,
+      "outlier_min_fraction": 0.25
+    },
+    "fpfh": {
+      "radius_mult": 5.0,
+      "max_nn": 100
+    },
+    "heatmap_sigma": 4.0,
+    "topk_fraction": 0.01,
+    "max_per_sample": 1000,
+    "coreset_size": 40000,
+    "target_points": 3000
+  }
+}

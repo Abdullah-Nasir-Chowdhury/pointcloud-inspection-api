@@ -23,7 +23,7 @@ sys.path.insert(0, str(HERE.parent))               # local run: import the packa
 from pcinspect.inspector import Inspector          # noqa: E402
 from pcinspect.preprocess import EmptyScanError    # noqa: E402
 
-MODELS = Path(os.environ.get("PCINSPECT_MODELS", HERE.parent / "models"))
+MODELS = Path(os.environ.get("PCINSPECT_MODELS", HERE.parent / "models"))   # shared with the API
 EXAMPLES = HERE / "examples"
 _cache: dict[str, Inspector] = {}
 
