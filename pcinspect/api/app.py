@@ -173,3 +173,19 @@ def _mount_demo() -> bool:
 
 
 _demo_mounted = _mount_demo()
+
+
+@app.on_event("startup")
+def _check_models() -> None:
+    """Fail loudly, not silently, when the container has no banks.
+
+    Why: the first Cloud Run deploy served zero categories because an ignore rule had dropped
+    every bank.npz from the upload, and /health still said "ok". Now it says so in the logs.
+    """
+    import logging
+    cats = available_categories()
+    if not cats:
+        logging.getLogger("uvicorn.error").warning(
+            "no model banks found under %s; /inspect will 404 for every category", MODELS_DIR.resolve())
+    else:
+        logging.getLogger("uvicorn.error").info("loaded categories: %s", ", ".join(cats))

@@ -121,6 +121,28 @@ Models are lazy-loaded per category and cached in a dict. Try: start the server,
 whole pipeline be verified before the 14 GB dataset arrived. Pattern worth copying: always have
 a tiny synthetic fixture so tests run in CI in seconds.
 
+## 9. Deployment: the ignore-file trap (`.gitignore`, `.dockerignore`, `.gcloudignore`)
+
+Three tools filter files before they leave your machine, and they do not agree by default:
+- `git` uses `.gitignore`. A blanket `*.npz` rule meant the ten model banks were never
+  committed, even though `git add -A` ran and `models/` was not ignored. Negate a specific
+  path with `!models/**/bank.npz`.
+- `docker build` uses `.dockerignore`, and only that file. Without it the 24 GB dataset would
+  have been sent to the daemon as build context.
+- `gcloud run deploy --source .` uses `.gcloudignore`; if that file is missing it synthesises
+  one from `.gitignore`, so the same `*.npz` rule emptied the first Cloud Run deployment while
+  `/health` cheerfully returned "ok" with an empty category list.
+Lessons: (1) after any deploy, call the endpoint that would prove the artefacts are present,
+not just the health check; (2) make the service log loudly at startup when a required artefact
+is missing (see `_check_models` in `pcinspect/api/app.py`); (3) `git ls-files <dir>` is the
+one-line check that the files you think you committed are actually tracked.
+
+Also learnt: a fresh Google Cloud project's Cloud Build runs as the Compute Engine default
+service account with no roles; one `add-iam-policy-binding` of `roles/cloudbuild.builds.builder`
+fixes the `PERMISSION_DENIED` on first deploy. And Vercel cannot host this at all: its 250 MB
+Python function limit is smaller than the Open3D wheel (448 MB). Check the heaviest dependency
+against the host's limits before choosing a host, not after.
+
 ## Reading order
 
 1. Horwitz & Hoshen, "Back to the Feature", 2023 (arXiv 2303.13194)
